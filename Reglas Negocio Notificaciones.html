@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manual SIA Notificaciones</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --p:#003875;--p2:#1a56a0;--pl:#dbeafe;--p3:#eff6ff;
+  --r:#b91c1c;--rl:#fee2e2;--g:#166534;--gl:#dcfce7;
+  --o:#c2410c;--ol:#ffedd5;--y:#92400e;--yl:#fef3c7;
+  --t:#1e293b;--tl:#64748b;--tll:#94a3b8;
+  --bd:#e2e8f0;--bg:#f1f5f9;--w:#fff;
+  --sw:230px;--hh:52px;--rd:10px;--sh:0 1px 4px rgba(0,0,0,.08)
+}
+/* ── LAYOUT: sticky header + sticky sidebar, body scrolls libremente ── */
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t);font-size:13px}
+#hdr{
+  position:sticky;top:0;z-index:200;
+  background:var(--p);color:var(--w);height:var(--hh);
+  display:flex;align-items:center;padding:0 18px;gap:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.3)
+}
+#hdr h1{font-size:14px;font-weight:700;letter-spacing:.2px}
+#hdr .hsub{font-size:10px;opacity:.75;border-left:1px solid rgba(255,255,255,.3);padding-left:10px;margin-left:4px}
+#lay{display:flex;align-items:flex-start}
+#sb{
+  width:var(--sw);flex-shrink:0;
+  position:sticky;top:var(--hh);
+  height:calc(100vh - var(--hh));
+  overflow-y:auto;
+  background:var(--w);border-right:1px solid var(--bd);padding:6px 0
+}
+#mn{flex:1;padding:22px;min-height:calc(100vh - var(--hh))}
+/* ── SCROLLBAR VISIBLE ── */
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:#64748b}
+/* Sidebar items */
+.sg{padding:10px 14px 4px;font-size:10px;font-weight:700;color:var(--tll);letter-spacing:.8px;text-transform:uppercase;margin-top:6px}
+.sg:first-child{margin-top:0}
+.nb{display:flex;align-items:center;gap:8px;width:100%;padding:8px 14px;border:none;background:none;cursor:pointer;font-size:12.5px;color:var(--t);text-align:left;transition:.15s}
+.nb:hover{background:#f8fafc}
+.nb.a{background:var(--p3);color:var(--p);font-weight:600;border-right:3px solid var(--p)}
+.ni{font-size:14px;width:18px;text-align:center}
+/* Cards */
+.card{background:var(--w);border-radius:var(--rd);padding:18px;box-shadow:var(--sh);border:1px solid var(--bd);margin-bottom:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+/* Stats */
+.st{background:var(--w);border-radius:var(--rd);padding:14px 16px;box-shadow:var(--sh);border:1px solid var(--bd);border-top:4px solid var(--p)}
+.st.r{border-top-color:var(--r)}.st.g{border-top-color:var(--g)}.st.o{border-top-color:var(--o)}
+.sn{font-size:24px;font-weight:800;color:var(--p)}.st.r .sn{color:var(--r)}.st.g .sn{color:var(--g)}.st.o .sn{color:var(--o)}
+.sl{font-size:11px;color:var(--tl);margin-top:2px}
+/* Badges */
+.bx{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700}
+.bp{background:var(--pl);color:var(--p)}.bg{background:var(--gl);color:var(--g)}
+.br{background:var(--rl);color:var(--r)}.bo{background:var(--ol);color:var(--o)}
+.by{background:var(--yl);color:var(--y)}.btl{background:#f1f5f9;color:var(--tl)}
+/* Buttons */
+.btn{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;display:inline-flex;align-items:center;gap:5px}
+.btn:disabled{opacity:.4;cursor:default}
+.btn-p{background:var(--p);color:var(--w)}.btn-p:hover:not(:disabled){background:var(--p2)}
+.btn-s{background:var(--pl);color:var(--p)}.btn-s:hover{background:#bfdbfe}
+.btn-g{background:none;border:1px solid var(--bd);color:var(--t)}.btn-g:hover:not(:disabled){background:var(--bg)}
+/* Alerts */
+.al{padding:10px 13px;border-radius:8px;font-size:12px;margin-bottom:10px;display:flex;gap:9px;align-items:flex-start;line-height:1.5}
+.al-r{background:var(--rl);border-left:4px solid var(--r);color:var(--r)}
+.al-y{background:var(--yl);border-left:4px solid #d97706;color:var(--y)}
+.al-g{background:var(--gl);border-left:4px solid var(--g);color:var(--g)}
+.al-b{background:var(--pl);border-left:4px solid var(--p);color:var(--p)}
+/* Typography */
+h2{font-size:18px;font-weight:700;color:var(--p);margin-bottom:3px}
+h3{font-size:14px;font-weight:700;margin-bottom:8px;color:var(--t)}
+h4{font-size:12px;font-weight:700;margin-bottom:6px;color:var(--tl);text-transform:uppercase;letter-spacing:.4px}
+.sub{color:var(--tl);font-size:12px;margin-bottom:18px;line-height:1.5}
+/* Wizard */
+.wz{max-width:640px}
+.wz-prog{display:flex;gap:5px;margin-bottom:18px;align-items:center}
+.wz-d{width:7px;height:7px;border-radius:50%;background:var(--bd);transition:.2s;flex-shrink:0}
+.wz-d.a{background:var(--p);transform:scale(1.4)}.wz-d.dn{background:var(--g)}
+.wz-note{font-size:11px;color:var(--y);margin-bottom:14px;padding:7px 11px;background:var(--yl);border-radius:6px}
+.wo{padding:11px 14px;border:2px solid var(--bd);border-radius:9px;background:var(--w);cursor:pointer;text-align:left;transition:.2s;display:flex;flex-direction:column;gap:2px;margin-bottom:7px;width:100%}
+.wo:hover{border-color:var(--p);background:var(--p3)}
+.wl{font-weight:600;font-size:13px;color:var(--t)}.wo:hover .wl{color:var(--p)}
+.ws{font-size:11px;color:var(--tl)}
+.wr{padding:18px;border-radius:12px;border:2px solid var(--p);background:var(--p3)}
+.wr-c{font-size:26px;font-weight:800;color:var(--p)}.wr-n{font-size:13px;font-weight:600;margin-bottom:12px}
+.ws-i{display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--pl);font-size:12px;line-height:1.5}
+.ws-i:last-child{border-bottom:none}
+.wsn{width:20px;height:20px;border-radius:50%;background:var(--p);color:var(--w);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.fl{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:9px 11px;background:rgba(0,56,117,.06);border-radius:8px;margin-top:12px}
+.fn{padding:4px 10px;background:var(--p);color:var(--w);border-radius:5px;font-size:10px;font-weight:700}
+.fa-arr{color:var(--tll);font-size:12px}
+/* Rules */
+.rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:18px}
+.rc{padding:10px 12px;border-radius:8px;background:var(--w);border:2px solid var(--bd);cursor:pointer;transition:.2s;text-align:left}
+.rc:hover,.rc.s{border-color:var(--p);background:var(--p3)}
+.rcd{font-size:17px;font-weight:800;color:var(--p)}.rnm{font-size:9.5px;color:var(--tl);margin-top:2px;line-height:1.3}
+/* Tabs */
+.tb-r{display:flex;border-bottom:2px solid var(--bd);margin-bottom:14px;overflow-x:auto}
+.tb{padding:7px 13px;border:none;background:none;cursor:pointer;font-size:11.5px;font-weight:500;color:var(--tl);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:.15s}
+.tb.a{color:var(--p);font-weight:700;border-bottom-color:var(--p)}
+.tab-nav{margin-bottom:10px}
+/* Lists */
+.ls{list-style:none;counter-reset:s}
+.ls li{counter-increment:s;display:flex;gap:9px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:12px;align-items:flex-start;line-height:1.5}
+.ls li:last-child{border-bottom:none}
+.ls li::before{content:counter(s);width:20px;height:20px;border-radius:50%;background:var(--p);color:var(--w);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ld{list-style:none}
+.ld li{padding:6px 0 6px 14px;position:relative;font-size:12px;border-bottom:1px solid var(--bd);line-height:1.5}
+.ld li:last-child{border-bottom:none}
+.ld li::before{content:'•';position:absolute;left:0;color:var(--p);font-weight:700}
+.ri{display:flex;gap:8px;padding:8px 10px;background:var(--rl);border-radius:7px;margin-bottom:5px;font-size:11.5px;color:var(--r);align-items:flex-start;line-height:1.5}
+/* Calc */
+.cf{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;align-items:end}
+.fg{display:flex;flex-direction:column;gap:4px}
+label{font-size:10px;font-weight:700;color:var(--tl);text-transform:uppercase;letter-spacing:.4px}
+input[type=date],input[type=number],select{padding:7px 10px;border:1px solid var(--bd);border-radius:7px;font-size:12px;background:var(--w);color:var(--t);width:100%}
+.cr{padding:18px;border-radius:12px;background:var(--w);border:2px solid var(--g);text-align:center;margin-bottom:14px}
+.cr .big{font-size:22px;font-weight:800;color:var(--p);margin:6px 0}
+.cr .lbl{font-size:10px;color:var(--tl);text-transform:uppercase;letter-spacing:.4px}
+.cr .dtl{font-size:11px;color:var(--tl);margin-top:8px;line-height:1.6}
+/* Checklists */
+.chi{display:flex;gap:9px;align-items:flex-start;padding:8px;border-radius:7px;cursor:pointer;margin-bottom:1px;transition:.15s}
+.chi:hover{background:var(--bg)}
+.chi input[type=checkbox]{width:14px;height:14px;cursor:pointer;margin-top:2px;flex-shrink:0;accent-color:var(--g)}
+.chi.dn .cl{text-decoration:line-through;color:var(--tll)}
+.cl{font-size:12px;cursor:pointer;line-height:1.5}
+.crit{font-size:9px;font-weight:700;color:var(--r);background:var(--rl);padding:1px 5px;border-radius:10px;margin-left:5px}
+.pb{height:6px;background:var(--bd);border-radius:10px;overflow:hidden;margin:8px 0}
+.pf-bar{height:100%;background:var(--g);border-radius:10px;transition:.3s}
+/* Causals */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--p);color:var(--w);padding:8px 12px;text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+td{padding:8px 12px;border-bottom:1px solid var(--bd);line-height:1.4}
+tr.sub td{background:rgba(22,101,52,.05)}
+tr.nosub td{background:rgba(185,28,28,.04)}
+tr:hover td{filter:brightness(.97)}
+/* FAQ */
+.fi{border:1px solid var(--bd);border-radius:8px;margin-bottom:6px;overflow:hidden}
+.fq{padding:11px 13px;cursor:pointer;font-weight:600;font-size:12px;background:var(--w);display:flex;justify-content:space-between;align-items:center;gap:10px;transition:.15s;user-select:none}
+.fq:hover{background:var(--bg)}
+.fat{padding:0 13px;max-height:0;overflow:hidden;transition:.35s;font-size:12px;color:var(--tl);line-height:1.7}
+.fat.op{padding:10px 13px;max-height:300px}
+.srch{width:100%;padding:8px 12px;border:1px solid var(--bd);border-radius:8px;font-size:13px;margin-bottom:12px;background:var(--w)}
+/* Pills */
+.pf-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.pill{padding:4px 12px;border-radius:20px;border:1px solid var(--bd);background:var(--w);cursor:pointer;font-size:11px;font-weight:600;color:var(--tl);transition:.15s}
+.pill:hover,.pill.a{background:var(--p);color:var(--w);border-color:var(--p)}
+@media(max-width:750px){.g2,.g4,.cf{grid-template-columns:1fr}#sb{display:none}#mn{padding:14px}}
+</style>
+</head>
+<body>
+<header id="hdr">
+  <span style="font-size:20px">📋</span>
+  <div>
+    <h1>Manual Interactivo de Notificaciones SIA</h1>
+    <span class="hsub">MinTIC · Subdirección de Investigaciones Administrativas · v2.0 · 2026</span>
+  </div>
+</header>
+<div id="lay">
+  <nav id="sb"></nav>
+  <main id="mn"></main>
+</div>
+
+<script>
+// ===== DATA =====
+const RD={
+  R0:{code:'R0',name:'Meta-Regla de Validación Obligatoria',badge:'META',bc:'btl',
+    when:['SIEMPRE antes de cualquier regla (R1–R13), sin excepción','Todo acto administrativo (definitivo o trámite)','No es regla de notificación, es procedimiento previo obligatorio'],
+    legal:['Art. 2 Const.: garantía del debido proceso','Art. 56 CPACA: múltiples medios de notificación','Arts. 70–71 CPACA: obligación de constancia documental'],
+    steps:['Descargar RUES vigente (máx. 2 años). Verificar campo "Aceptación Electrónica"','Revisar expediente: apoderado especial, memoriales restrictivos, correos actualizados','Consultar RUTIC si operador es telecom o postal','Seleccionar canal: Apoderado > RUES Jud. > RUTIC > Rep. Legal > Expediente','Decidir regla aplicable y documentar en Acta R0'],
+    docs:['Certificado RUES vigente (máx. 2 años)','Certificado RUTIC (si aplica)','Acta R0: fuentes, datos, regla seleccionada y justificación'],
+    risks:['❌ RUES vencido >2 años → NULIDAD','❌ Ignorar apoderado especial → NULIDAD','❌ No revisar memoriales restrictivos → NULIDAD','❌ Confundir tipo de acto → regla equivocada'],
+    plazo:'R0 no genera plazo propio.\nLos plazos inician con la regla seleccionada.',flow:null},
+  R1:{code:'R1',name:'Notificación Personal por Medios Electrónicos',badge:'DEFINITIVO',bc:'bp',
+    when:['Acto DEFINITIVO','RUES indica "SÍ ACEPTA" notificación electrónica','Sin memorial restrictivo en expediente','R0 ejecutado'],
+    legal:['Art. 56 CPACA: notificación electrónica','Art. 69 CPACA mod. Ley 2080/2021: surtida = acuse de ENTREGA','Ley 2080/2021 Art. 1: igualdad de efectos con notificación presencial'],
+    steps:['Ejecutar R0 completamente','Seleccionar canal según Matriz de Prioridades','Preparar correo: asunto [MinTIC-SIA] Notificación de [N° Acto]','Adjuntar: acto ÍNTEGRO + derechos + plazos + aviso de surtida','Enviar y capturar ACUSE DE ENTREGA (no de lectura)','Crear Acta de Surtida con fecha y hora exacta'],
+    docs:['RUES con "SÍ ACEPTA"','Acta R0','Correo enviado con anexos completos','Acuse de entrega (fecha/hora exacta)','Acta de Surtida'],
+    risks:['❌ NO adjuntar acto íntegro → NULIDAD (Art. 70 CPACA)','❌ NO advertir derechos y recursos → NULIDAD','❌ Usar acuse de LECTURA en lugar de ENTREGA','❌ No registrar fecha/hora exacta del acuse','❌ Enviar a correo incorrecto u obsoleto'],
+    plazo:'Surtida = momento exacto del acuse de entrega.\nPlazo defensa inicia DÍA HÁBIL SIGUIENTE.\nDescargos: 15 días | Alegatos: 10 días hábiles.',
+    flow:['R0','→','R1 ✓','→','Surtida inmediata','→','Si falla','→','R6','→','o R5']},
+  R2:{code:'R2',name:'Citación para Notificación Personal (RUES Vacío)',badge:'DEFINITIVO',bc:'bp',
+    when:['Acto DEFINITIVO','RUES sin información sobre aceptación (campo vacío)','No se puede asumir aceptación ni rechazo','R0 ejecutado'],
+    legal:['Art. 56 CPACA: no puede asumir aceptación sin base','Art. 57 CPACA: notificación personal por comparecencia','Art. 68 CPACA: número de diligencias'],
+    steps:['Ejecutar R0 y confirmar RUES con campo vacío','Preparar citación con plazo de 5 DÍAS HÁBILES','Envío CONCURRENTE SIMULTÁNEO: correo + postal certificado','Esperar exactamente 5 días hábiles','Si comparece → Surtida personal ese día','Si NO → Acta de vencimiento + activar R5'],
+    docs:['RUES con campo vacío','Acta R0','Citación enviada','Acuses correo + postal','Acta comparecencia o vencimiento'],
+    risks:['❌ Plazo <5 días → NULIDAD','❌ Envío solo por un canal','❌ Cambiar a R5 antes de vencer 5 días','❌ Omitir advertencia de aviso en citación'],
+    plazo:'5 días hábiles para comparecer.\nSi comparece: surtida personal ese día.\nSi NO: activar R5.',
+    flow:['R0','→','R2 Citación','→','5 días','→','¿Comparece?','→','SÍ: Surtida','→','NO: R5']},
+  R3:{code:'R3',name:'Citación Notificación Personal (RUES "NO ACEPTA")',badge:'DEFINITIVO',bc:'bp',
+    when:['Acto DEFINITIVO','RUES indica explícitamente "NO ACEPTA" electrónica','Operador manifestó negativa expresa','R0 ejecutado'],
+    legal:['Arts. 56–57 CPACA: respeto a preferencias del operador','Ley 2080/2021: mantiene preferencias expresas'],
+    steps:['Ejecutar R0 confirmando "NO ACEPTA" en RUES','Documentar el rechazo explícitamente en Acta R0','Preparar citación (5 DÍAS HÁBILES)','Envío CONCURRENTE: correo + postal','Esperar 5 días. Si comparece → Surtida. Si NO → R5'],
+    docs:['RUES con "NO ACEPTA"','Acta R0 con mención del rechazo','Citación + acuses','Acta comparecencia/vencimiento'],
+    risks:['❌ Enviar correo directo violando la negativa → NULIDAD','❌ Confundir con R2','❌ No documentar "NO ACEPTA" en Acta R0'],
+    plazo:'5 días hábiles. Mismo flujo que R2.',
+    flow:['R0','→','R3 Citación','→','5 días','→','¿Comparece?','→','SÍ: Surtida','→','NO: R5']},
+  'R3-EXC':{code:'R3-EXC',name:'Citación a Dirección Física (Solicitud Expresa)',badge:'EXCEPCIÓN',bc:'by',
+    when:['Acto DEFINITIVO','Memorial en expediente solicitando solo notificación física','Solicitud vigente y no revocada','R0 ejecutado'],
+    legal:['Arts. 56, 70 CPACA: respeto a preferencias expresas','Principio constitucional: libertad de forma'],
+    steps:['Ejecutar R0 y localizar memorial restrictivo','Documentar en Acta R0: fecha, dirección exacta, vigencia','Preparar citación FÍSICA (papel)','Envío postal certificado EXACTAMENTE a dirección del memorial','Esperar 5 días desde entrega postal. Si NO → R5'],
+    docs:['Fotocopia del memorial','Acta R0 con datos del memorial','Citación física','Constancia entrega postal'],
+    risks:['❌ Usar dirección diferente al memorial','❌ No documentar vigencia','❌ Ignorar exclusividad y usar correo'],
+    plazo:'5 días hábiles desde entrega postal.',
+    flow:['R0','→','R3-EXC Físico','→','5 días','→','¿Comparece?','→','SÍ: Surtida','→','NO: R5']},
+  R5:{code:'R5',name:'Notificación Subsidiaria por Aviso (Concurrente)',badge:'SUBSIDIARIO',bc:'bo',
+    when:['Acto DEFINITIVO','Fallaron R1/R2/R3/R3-EXC sin comparecencia','5 días cumplidos sin resultado','Operador activo en RUES'],
+    legal:['Art. 67 CPACA: aviso cuando falla notificación personal','Ley 2080/2021','Art. 69 CPACA: surtida = DÍA HÁBIL SIGUIENTE'],
+    steps:['Confirmar RUES activo + Acta de vencimiento','Preparar AVISO con acto íntegro, derechos y advertencia de surtida','Envío SIMULTÁNEO: correo + postal + fax (si existe)','Basta que UNO entregue exitosamente','SURTIDA = AL FINALIZAR día hábil SIGUIENTE a entrega','Crear Acta de Surtida'],
+    docs:['Acta vencimiento R2/R3','RUES activo','Aviso + acto (todos canales)','Acuses de entrega','Acta de Surtida'],
+    risks:['❌ Falta acto íntegro → NULIDAD','❌ Envío secuencial (no simultáneo)','❌ Contar plazo desde día de entrega (no del siguiente) → NULIDAD','❌ No documentar fecha/hora de surtida'],
+    plazo:'SURTIDA = AL FINALIZAR día hábil SIGUIENTE a entrega.\nPlazo defensa inicia el día siguiente a surtida.',
+    flow:['R2/R3 falló','→','R5 Aviso','→','¿Entrega?','→','SÍ: Surtida','→','NO: R6','→','o R7']},
+  R6:{code:'R6',name:'Relanzamiento Expedito por Causales de Devolución',badge:'SUBSIDIARIO',bc:'bo',
+    when:['Notificación rebotó con causal específica','Causal SUBSANABLE (NE, DR, N1/N2, C1/C2)','Se puede corregir y reenviar'],
+    legal:['Art. 68 CPACA: permite múltiples diligencias','Deber de agotar todos los medios disponibles'],
+    steps:['Recibir y registrar causal en acta','¿Subsanable (NE,DR,N1/N2,C1/C2) o no (NS,RH)?','Si SUBSANABLE: corregir en RUES y relanzar','Si NO SUBSANABLE: cambiar a R5 o R7 sin demora','Si caducidad <30 días: acelerar a R7 directamente'],
+    docs:['Causal de devolución','Acta de decisión (relanzar vs cambiar)','Nueva copia + acuse (si relanza)'],
+    risks:['❌ Relanzar al mismo dato sin corregir','❌ Confundir causales sub. y no sub.','❌ No documentar decisión en acta'],
+    plazo:'Si relanza: términos reinician desde nueva surtida.\nNUNCA archivar sin intentar notificar.',
+    flow:['Devolución','→','¿Subsanable?','→','SÍ: Corregir+Relanzar','→','NO: R5 o R7']},
+  R7:{code:'R7',name:'Publicación en Página Web MinTIC (Última Ratio)',badge:'ÚLTIMA RATIO',bc:'br',
+    when:['Acto DEFINITIVO','R1–R6 completamente agotados sin éxito','ÚLTIMA RATIO documentada'],
+    legal:['Art. 67 CPACA: "lugar público" incluye web','Ley 2080/2021','Jurisprudencia Consejo de Estado'],
+    steps:['Acta de agotamiento completo R1–R6','Preparar aviso con acto íntegro','Publicar SIMULTÁNEAMENTE: web MinTIC + cartelera física','Mantener EXACTAMENTE 5 días hábiles','Retirar y documentar fecha/hora exacta','SURTIDA = DÍA HÁBIL SIGUIENTE al retiro'],
+    docs:['Acta agotamiento R1–R6','Aviso publicado','Acta fijación cartelera','Captura pantalla web','Acta desfijación (fecha/hora)','Acta de Surtida'],
+    risks:['❌ Aplicar sin agotar R1–R6 → NULIDAD','❌ Retirar antes de 5 días → NULIDAD','❌ Surtida desde día 5 (no desde día sig. al retiro) → NULIDAD','❌ No registrar hora exacta del retiro'],
+    plazo:'Publicación: 5 días hábiles.\nSURTIDA = DÍA HÁBIL SIGUIENTE al retiro.',
+    flow:['R5 agotado','→','R6 agotado','→','R7 Publicación','→','5 días','→','Retiro','→','Surtida']},
+  'R2-ALT':{code:'R2-ALT',name:'Notificación por Interacción en Portal Web',badge:'ESPECIAL',bc:'bg',
+    when:['Acto DEFINITIVO','Operador cargó docs en Portal SIA ANTES de surtida','Demuestra de facto aceptación electrónica'],
+    legal:['Art. 56 CPACA: consentimiento tácito por uso','Ley 2080/2021: uso de portal = evidencia de aceptación'],
+    steps:['Detectar cargue en portal: fecha/hora, docs, operador','Crear Acta de activación R1 por portal','Proceder como R1: enviar acto por correo','Capturar acuse de entrega','Crear Acta de Surtida'],
+    docs:['Constancia cargue en portal','Acta activación R1','Soporte documental completo de R1'],
+    risks:['❌ Confundir cargue con surtida formal','❌ No capturar acuse de entrega del correo'],
+    plazo:'Igual que R1: surtida = acuse de entrega del correo.',
+    flow:['Portal: cargue docs','→','Activa R1','→','Surtida = acuse']},
+  R9:{code:'R9',name:'Comunicación Actuaciones Probatorias (Acto Simple)',badge:'TRÁMITE',bc:'btl',
+    when:['Acto de TRÁMITE','Tipo SIMPLE: cierre de período probatorio','⚠️ NO requiere "SÍ ACEPTA" en RUES'],
+    legal:['Art. 56 CPACA: trámite sin aceptación previa','Ley 2080/2021'],
+    steps:['Ejecutar R0','Preparar: cierre período + traslado para alegar + plazo 10 días','Envío electrónico preferente (físico si hay solicitud expresa)','Capturar acuse de entrega','Computar: 10 días hábiles desde día siguiente al acuse'],
+    docs:['Acta R0','Comunicación enviada','Acuse de entrega'],
+    risks:['❌ Confundir con notificación formal','❌ Exigir "SÍ ACEPTA" incorrectamente','❌ Omitir traslado para alegar'],
+    plazo:'10 DÍAS HÁBILES para alegatos.\nInicia DÍA HÁBIL SIGUIENTE al acuse.',
+    flow:['R0','→','R9 Comunicación','→','Acuse','→','10 días alegatos']},
+  R10:{code:'R10',name:'Comunicación Actuaciones Probatorias (Compuesto 1)',badge:'TRÁMITE',bc:'btl',
+    when:['Acto de TRÁMITE','Tipo COMPUESTO 1: apertura de período probatorio','NO requiere "SÍ ACEPTA"'],
+    legal:['Art. 56 CPACA','Ley 2080/2021'],
+    steps:['Ejecutar R0','LEER el acto para determinar plazo (VARIABLE: 20, 30, 45 días…)','Preparar: apertura período + enumeración pruebas + plazo exacto','Documentar el plazo en el sistema','Envío y acuse de entrega'],
+    docs:['Acta R0','Comunicación con listado pruebas','Acuse','Registro plazo variable en sistema'],
+    risks:['❌ Asumir plazo fijo de 10 días: R10 es VARIABLE','❌ No documentar plazo exacto','❌ Confundir con R11'],
+    plazo:'VARIABLE según el acto (20, 30, 45 días…).\nLeer el acto. Inicia DÍA HÁBIL SIGUIENTE al acuse.',
+    flow:['R0','→','R10 Apertura','→','Plazo VARIABLE','→','Pruebas','→','R11']},
+  R11:{code:'R11',name:'Comunicación Actuaciones Probatorias (Compuesto 2)',badge:'TRÁMITE',bc:'btl',
+    when:['Acto de TRÁMITE','Tipo COMPUESTO 2: cierre con pruebas practicadas','NO requiere "SÍ ACEPTA"'],
+    legal:['Art. 56 CPACA','Ley 2080/2021'],
+    steps:['Ejecutar R0','Preparar: cierre formal + pruebas incorporadas + pruebas prescindidas + ampliación si aplica','Conferir traslado para alegar (10 días)','Envío y acuse'],
+    docs:['Acta R0','Comunicación con listado completo de pruebas','Acuse'],
+    risks:['❌ Confundir con R10 (R10 abre, R11 cierra)','❌ No listar pruebas incorporadas/prescindidas','❌ Omitir si se amplió el período'],
+    plazo:'10 DÍAS HÁBILES para alegatos.\nSimilar a R9 pero ocurre después de R10.',
+    flow:['R10 completado','→','R11 Cierre','→','10 días alegatos']},
+  R13:{code:'R13',name:'Notificación por Conducta Concluyente',badge:'ESPECIAL',bc:'bg',
+    when:['Acto DEFINITIVO','R1–R7 fallaron completamente','Antes de surtida: operador radicó escrito mostrando conocimiento del acto'],
+    legal:['Sentencias Consejo de Estado: conducta concluyente salva notificación','Art. 27 CPACA'],
+    steps:['Identificar escrito con conocimiento: menciona monto, acusaciones o regulaciones','Documentar en Acta: CITA TEXTUAL + análisis + conclusión','SURTIDA = fecha de RADICACIÓN ante MinTIC (NO de redacción)','Crear Acta de Surtida con fecha de radicación','Continuar procedimiento normalmente'],
+    docs:['Copia del escrito','Sello/certificado de radicación MinTIC','Acta de Conducta Concluyente (cita textual)','Acta de Surtida (fecha radicación)'],
+    risks:['❌ Usar fecha de REDACCIÓN en lugar de RADICACIÓN','❌ No tener cita textual → Consejo de Estado rechaza','❌ Asumir conducta sin documentación clara','❌ Aplicar a actos de TRÁMITE'],
+    plazo:'SURTIDA = fecha de radicación ante MinTIC.\nPlazo defensa inicia DÍA HÁBIL SIGUIENTE.',
+    flow:['R1–R7 fallaron','→','Escrito operador','→','R13 Salva','→','Surtida=radicación']}
+};
+
+const WN={
+  start:{q:'¿Qué tipo de acto administrativo va a notificar?',step:1,total:3,
+    opts:[{l:'📋 Acto Definitivo',s:'Resolución, pliego de cargos, sanción',n:'q_rues'},{l:'📁 Acto de Trámite',s:'Actuación probatoria, comunicación',n:'q_tramite'}]},
+  q_rues:{q:'¿Qué indica el RUES sobre notificación electrónica?',step:2,total:3,
+    note:'Debe tener el certificado RUES vigente (máx. 2 años) antes de continuar.',
+    opts:[{l:'✅ SÍ ACEPTA electrónica',n:'q_restrictiva'},{l:'❌ NO ACEPTA electrónica',n:'res_R3'},{l:'⬜ Campo vacío / sin información',n:'res_R2'},{l:'⚠️ No he consultado el RUES aún',n:'warn'}]},
+  q_restrictiva:{q:'¿Existe memorial en expediente solicitando exclusivamente notificación física?',step:3,total:3,
+    opts:[{l:'✉️ Sí, hay memorial "solo físico"',n:'res_R3-EXC'},{l:'📧 No hay memorial restrictivo',n:'q_portal'}]},
+  q_portal:{q:'¿El operador ha cargado documentos en el Portal SIA antes de esta notificación?',step:3,total:3,
+    opts:[{l:'🌐 Sí, ha interactuado con el Portal SIA',n:'res_R2-ALT'},{l:'📩 No, no ha usado el portal',n:'res_R1'}]},
+  q_tramite:{q:'¿Qué tipo de acto de trámite es?',step:2,total:2,
+    opts:[{l:'🔚 Simple: Cierre de período probatorio',s:'10 días alegatos',n:'res_R9'},{l:'🔛 Compuesto 1: Apertura de período probatorio',s:'Plazo variable para practicar pruebas',n:'res_R10'},{l:'🔒 Compuesto 2: Cierre con traslado (post práctica)',s:'10 días alegatos de conclusión',n:'res_R11'}]},
+  warn:{warning:true,msg:'R0 exige consultar el RUES vigente (máx. 2 años) ANTES de cualquier notificación. Sin esta validación la notificación puede ser nula.',back:'start'},
+  res_R1:{result:'R1'},res_R2:{result:'R2'},res_R3:{result:'R3'},'res_R3-EXC':{result:'R3-EXC'},'res_R2-ALT':{result:'R2-ALT'},
+  res_R9:{result:'R9'},res_R10:{result:'R10'},res_R11:{result:'R11'}
+};
+
+const CAUSALS=[
+  {c:'NE',n:'Número Errado',d:'Correo o número incorrecto',s:true,a:'RELANZAR – Corregir en RUES y reenviar',t:'Inmediato'},
+  {c:'DR',n:'Dirección Errada',d:'Dirección incorrecta',s:true,a:'RELANZAR – Validar y reenviar',t:'Inmediato'},
+  {c:'N1/N2',n:'No Contactado',d:'No fue posible contactar',s:true,a:'Esperar 3–5 días, luego RELANZAR',t:'Tras espera'},
+  {c:'C1/C2',n:'Cerrado',d:'Domicilio cerrado temporalmente',s:true,a:'Esperar normalización, RELANZAR',t:'Cuando abra'},
+  {c:'FM',n:'Fuerza Mayor',d:'Desastre u orden público',s:true,a:'Esperar y RELANZAR',t:'Flexible'},
+  {c:'NS',n:'No Reside',d:'Operador no está allí',s:false,a:'NO relanzar → cambiar a R5 o R7',t:'Sin demora'},
+  {c:'RH',n:'Rehusado',d:'Operador rechaza explícitamente',s:false,a:'NO relanzar → cambiar a R5',t:'Sin demora'},
+  {c:'NR',n:'No Radicado',d:'No radicado en domicilio',s:null,a:'EVALUAR: error técnico → relanzar; rechaza → R5',t:'Contexto'}
+];
+
+const CL={
+  R0:{label:'R0 – Validación Obligatoria',items:[
+    {t:'Certificado RUES vigente descargado (máx. 2 años)',crit:true},
+    {t:'Campo "Aceptación Electrónica" revisado'},
+    {t:'Expediente: apoderados especiales activos',crit:true},
+    {t:'Expediente: memoriales restrictivos',crit:true},
+    {t:'Expediente: correos actualizados'},
+    {t:'RUTIC consultado (si telecom/postal)'},
+    {t:'Canal seleccionado (Matriz Prioridades)'},
+    {t:'Regla determinada y justificada'},
+    {t:'Acta R0 creada y archivada',crit:true}]},
+  R1:{label:'R1 – Notificación Electrónica',items:[
+    {t:'R0 completado y Acta R0 archivada'},
+    {t:'Correo verificado múltiples veces',crit:true},
+    {t:'Acto íntegro (portada a última hoja)',crit:true},
+    {t:'Advertencia de derechos y recursos',crit:true},
+    {t:'Plazos específicos indicados'},
+    {t:'Asunto: [MinTIC-SIA] Notificación de [N°]'},
+    {t:'Todos los anexos adjuntados',crit:true},
+    {t:'Acuse de ENTREGA (no lectura) capturado',crit:true},
+    {t:'Acta de Surtida con fecha/hora exacta',crit:true}]},
+  R5:{label:'R5 – Aviso Subsidiario',items:[
+    {t:'Acta de vencimiento R2/R3 (5 días cumplidos)',crit:true},
+    {t:'RUES verificado: operador activo',crit:true},
+    {t:'Aviso con acto íntegro adjunto',crit:true},
+    {t:'Derechos y recursos incluidos'},
+    {t:'Advertencia de surtida incluida'},
+    {t:'Envío simultáneo por correo'},
+    {t:'Envío simultáneo por postal certificado'},
+    {t:'Envío simultáneo por fax (si hay)'},
+    {t:'Acuses capturados (todos los canales)'},
+    {t:'Surtida = DÍA HÁBIL SIGUIENTE a entrega',crit:true},
+    {t:'Acta de Surtida con fecha exacta',crit:true}]},
+  R7:{label:'R7 – Publicación Web (Última Ratio)',items:[
+    {t:'Acta agotamiento R1–R6 completada',crit:true},
+    {t:'Aviso con acto íntegro preparado'},
+    {t:'Publicado en web MinTIC',crit:true},
+    {t:'Fijado en cartelera física',crit:true},
+    {t:'Captura pantalla web archivada'},
+    {t:'Mantenido EXACTAMENTE 5 días hábiles',crit:true},
+    {t:'Retirado en fecha correcta'},
+    {t:'Fecha/hora exacta del retiro documentada',crit:true},
+    {t:'Surtida = DÍA HÁBIL SIGUIENTE al retiro',crit:true},
+    {t:'Acta de Surtida archivada'}]}
+};
+
+const FAQ=[
+  {q:'¿Cuándo comienza el plazo de defensa?',a:'DÍA HÁBIL SIGUIENTE a la surtida. Nunca desde el día de surtida misma, sino el día hábil siguiente.'},
+  {q:'¿Diferencia entre "acuse de lectura" y "acuse de entrega"?',a:'Lectura: el usuario abrió el correo. Entrega: el correo llegó al buzón. Desde Ley 2080/2021 basta el acuse de ENTREGA.'},
+  {q:'¿Puedo saltar R2/R3 e ir directo a R5 o R7?',a:'NO. Debe agotar R2/R3 (5 días). Solo si no hay comparecencia procede R5. Solo si R5 falla procede R7. Saltarse pasos genera nulidad.'},
+  {q:'¿Qué hago si el RUES está vacío?',a:'Aplicar R2. Enviar citación por correo + postal concurrentemente. Esperar 5 días hábiles. Si no comparece → R5.'},
+  {q:'¿Los operadores múltiples tienen plazos simultáneos?',a:'NO. Cada operador tiene plazo INDEPENDIENTE desde su propia surtida. El procedimiento espera hasta que venza el ÚLTIMO plazo.'},
+  {q:'¿Qué pasa si el operador se liquida?',a:'Antes de decisión: archivar pero notificar resolución de archivo al liquidador. Después de decisión: NO archivar; notificar al liquidador en RUES. Sin liquidador → R7.'},
+  {q:'¿Cuántas veces puedo relanzar?',a:'Sin límite. Relanzar mientras la causal sea subsanable (NE, DR, N1/N2, C1/C2). Si no subsanable (NS, RH) → cambiar a R5 o R7.'},
+  {q:'¿Puedo usar correo de empleado del operador?',a:'NO. Usar siempre datos oficiales: RUES, RUTIC, o apoderado especial. Nunca correos personales de gerentes o abogados externos.'},
+  {q:'¿Qué es R13?',a:'Notificación por conducta concluyente. Aplica cuando la notificación formal falló Y el operador radicó escrito ante MinTIC antes de la surtida mostrando conocimiento explícito. Surtida = fecha de RADICACIÓN, no de redacción.'},
+  {q:'¿Diferencia entre R9, R10 y R11?',a:'R9: Simple, cierra período (10 días). R10: Compuesto 1, ABRE período (plazo VARIABLE). R11: Compuesto 2, CIERRA después de practicar pruebas (10 días). Ninguno requiere "SÍ ACEPTA".'},
+  {q:'¿Riesgo de no documentar en acta?',a:'Nulidad del procedimiento. INTEGRATIC y el juez verán que falta la constancia. Siempre crear acta de cada paso.'},
+  {q:'¿Qué es R2-ALT?',a:'Se activa cuando el operador carga documentos en el Portal SIA antes de la surtida formal, demostrando aceptación electrónica de facto. Se procede como R1.'}
+];
+
+const GLOS=[
+  {t:'Acto Compuesto 1',d:'Acto de trámite que abre período probatorio.',r:'R10'},
+  {t:'Acto Compuesto 2',d:'Acto de trámite que cierra período e incorpora/prescinde pruebas.',r:'R11'},
+  {t:'Acto de trámite',d:'Impulsa el procedimiento sin resolver el fondo. Sin "SÍ ACEPTA".',r:'R9–R11'},
+  {t:'Acto definitivo',d:'Resuelve el fondo (sanción, archivo). Requiere notificación R1–R7.',r:'R1–R7'},
+  {t:'Acuse de entrega',d:'Confirmación del servidor de llegada al buzón. No requiere lectura.',r:'R1,R5'},
+  {t:'Aviso de notificación',d:'Mecanismo subsidiario que envía el acto por múltiples canales simultáneamente.',r:'R5'},
+  {t:'Causal de devolución',d:'Razón de rebote. Determina si relanzar o cambiar de regla.',r:'R6'},
+  {t:'Citación',d:'Convoca al operador a comparecer en 5 días hábiles.',r:'R2,R3'},
+  {t:'Conducta concluyente',d:'Escrito antes de surtida que prueba conocimiento explícito del acto.',r:'R13'},
+  {t:'Envío concurrente',d:'Transmisión simultánea a múltiples canales sin esperar resultados.',r:'R2,R3,R5'},
+  {t:'Meta-regla',d:'Procedimiento previo obligatorio que valida datos antes de cualquier regla.',r:'R0'},
+  {t:'RUES',d:'Registro Único Empresarial. Fuente oficial de datos. Vigencia máx. 2 años.',r:'R0'},
+  {t:'RUTIC',d:'Registro de operadores telecom. Complementa RUES para ese sector.',r:'R0'},
+  {t:'Solicitud restrictiva',d:'Memorial que pide "solo físico" o rechaza electrónica.',r:'R3-EXC'},
+  {t:'Surtida procesal',d:'Momento exacto de notificación válida. Varía por regla.',r:'Todas'},
+  {t:'Última ratio',d:'R7 solo aplica cuando se agotaron completamente R1–R6.',r:'R7'}
+];
+
+// ===== STATE =====
+let curSec='home',wizHist=[],wizNode='start';
+let selRule='R1',selTab=0,tabHist=[];
+let selChk='R0',chkSt={},faqOpen=-1;
+
+// ===== HELPERS =====
+function bizAdd(d,n){let dt=new Date(d),a=0;while(a<n){dt.setDate(dt.getDate()+1);if(dt.getDay()&&dt.getDay()<6)a++;}return dt;}
+function fmtD(d){return d.toLocaleDateString('es-CO',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
+
+// ===== SIDEBAR =====
+const NAV=[
+  {id:'home',l:'Inicio',i:'🏠',g:'Principal'},
+  {id:'wizard',l:'Árbol de Decisión',i:'🧭',g:'Principal'},
+  {id:'rules',l:'Todas las Reglas',i:'📚',g:'Referencia'},
+  {id:'calc',l:'Calculadora de Plazos',i:'📅',g:'Herramientas'},
+  {id:'check',l:'Checklists',i:'✅',g:'Herramientas'},
+  {id:'causals',l:'Causales (R6)',i:'↩️',g:'Herramientas'},
+  {id:'faq',l:'Preguntas Frecuentes',i:'❓',g:'Referencia'},
+  {id:'glossary',l:'Glosario',i:'📖',g:'Referencia'}
+];
+
+function mkSidebar(){
+  const gs=[...new Set(NAV.map(x=>x.g))];
+  document.getElementById('sb').innerHTML=gs.map(g=>
+    `<div class="sg">${g}</div>`+NAV.filter(x=>x.g===g).map(x=>
+      `<button class="nb${curSec===x.id?' a':''}" data-id="${x.id}" onclick="go('${x.id}')"><span class="ni">${x.i}</span>${x.l}</button>`
+    ).join('')
+  ).join('');
+}
+
+function go(id){curSec=id;mkSidebar();render();}
+
+// ===== TAB HELPERS =====
+function setRule(c){selRule=c;selTab=0;tabHist=[];render();}
+function goTab(i){if(i!==selTab){tabHist.push(selTab);selTab=i;render();}}
+function tabBack(){if(tabHist.length){selTab=tabHist.pop();render();}}
+
+// ===== RENDER =====
+function render(){
+  const m=document.getElementById('mn');
+  const fn={home:rHome,wizard:rWizard,rules:rRules,calc:rCalc,check:rCheck,causals:rCausals,faq:rFaq,glossary:rGlossary};
+  m.innerHTML=fn[curSec]?fn[curSec]():'';
+  if(curSec==='calc')bindCalc();
+}
+
+// ── HOME ──
+function rHome(){return`
+<h2>📋 Manual de Notificaciones SIA</h2>
+<div class="sub">Guía operativa interactiva · Subdirección de Investigaciones Administrativas · MinTIC v2.0</div>
+<div class="g4" style="margin-bottom:16px">
+  <div class="st"><div class="sn">13</div><div class="sl">Reglas de Notificación</div></div>
+  <div class="st g"><div class="sn">R0</div><div class="sl">Meta-Regla Obligatoria</div></div>
+  <div class="st o"><div class="sn">8</div><div class="sl">Causales de Devolución</div></div>
+  <div class="st r"><div class="sn">10+</div><div class="sl">Riesgos Críticos de Nulidad</div></div>
+</div>
+<div class="al al-r"><span>⚠️</span><div><strong>Obligatorio:</strong> La Meta-Regla <strong>R0</strong> debe ejecutarse ANTES de cualquier notificación. Su omisión puede causar nulidad de todo el procedimiento.</div></div>
+<div class="al al-b"><span>💡</span><div>Use el <strong>Árbol de Decisión</strong> para identificar la regla correcta. Use la <strong>Calculadora</strong> para vencimientos en días hábiles.</div></div>
+<div class="g2">
+  <div class="card"><h3>🔄 Flujo Actos Definitivos</h3>
+    <div style="font-size:12px;color:var(--tl);line-height:2.1;margin-top:8px">
+      <div>1️⃣ <strong>R0</strong> → Validación RUES</div>
+      <div>2️⃣ <strong>R1</strong> SÍ / <strong>R2</strong> Vacío / <strong>R3</strong> NO</div>
+      <div>3️⃣ ¿Compareció 5 días? → Surtida personal</div>
+      <div>4️⃣ Si no → <strong>R5</strong> Aviso concurrente</div>
+      <div>5️⃣ Si falla → <strong>R6</strong> Relanzamiento</div>
+      <div>6️⃣ Última ratio → <strong>R7</strong> Publicación web</div>
+    </div>
+  </div>
+  <div class="card"><h3>📁 Flujo Actos de Trámite</h3>
+    <div style="font-size:12px;color:var(--tl);line-height:2.1;margin-top:8px">
+      <div>1️⃣ <strong>R0</strong> → Validación obligatoria</div>
+      <div>2️⃣ Tipo de acto:</div>
+      <div style="padding-left:14px">• Simple → <strong>R9</strong> (10 días)</div>
+      <div style="padding-left:14px">• Compuesto 1 → <strong>R10</strong> (variable)</div>
+      <div style="padding-left:14px">• Compuesto 2 → <strong>R11</strong> (10 días)</div>
+      <div>3️⃣ <strong>NO requiere "SÍ ACEPTA"</strong></div>
+    </div>
+  </div>
+</div>
+<div class="card"><h3>⚡ Acceso Rápido</h3>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+    <button class="btn btn-p" onclick="go('wizard')">🧭 Árbol de Decisión</button>
+    <button class="btn btn-s" onclick="go('calc')">📅 Calcular Plazos</button>
+    <button class="btn btn-g" onclick="go('causals')">↩️ Guía Causales</button>
+    <button class="btn btn-g" onclick="setRule('R0');go('rules')">📖 Ver R0</button>
+  </div>
+</div>`;}
+
+// ── WIZARD ──
+function rWizard(){
+  const nd=WN[wizNode];const tot=nd.total||3;
+  const dots=Array.from({length:tot},(_,i)=>`<div class="wz-d ${i<wizHist.length?'dn':i===wizHist.length?'a':''}"></div>`).join('');
+  const bk=wizHist.length?`<button class="btn btn-g" onclick="wBack()">← Atrás</button>`:'';
+  if(nd.warning)return`<h2>🧭 Árbol de Decisión</h2><div class="sub">Identificador de regla paso a paso</div>
+    <div class="wz"><div class="al al-r"><span>⛔</span><div><strong>Paso pendiente:</strong> ${nd.msg}</div></div>
+    <div style="display:flex;gap:8px"><button class="btn btn-p" onclick="wizNode='start';wizHist=[];render()">🔄 Volver</button>${bk}</div></div>`;
+  if(nd.result){
+    const r=RD[nd.result];
+    const fl=r.flow?`<div class="fl">${r.flow.map((f,i)=>i%2===0?`<span class="fn">${f}</span>`:`<span class="fa-arr">→</span>`).join('')}</div>`:'';
+    return`<h2>🧭 Árbol de Decisión</h2><div class="sub">Regla identificada</div>
+    <div class="wz">
+      <div class="wz-prog">${Array.from({length:tot},()=>`<div class="wz-d dn"></div>`).join('')}
+        <span style="font-size:11px;color:var(--g);margin-left:6px;font-weight:700">✓ Completado</span></div>
+      <div class="wr">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span style="font-size:24px;font-weight:800;color:var(--p)">${r.code}</span>
+          <span class="bx ${r.bc}">${r.badge}</span></div>
+        <div class="wr-n">${r.name}</div>
+        <div class="al al-g"><span>✅</span><div>Regla identificada. Siga los pasos.</div></div>
+        <h4>Pasos principales</h4>
+        <div>${r.steps.map((s,i)=>`<div class="ws-i"><div class="wsn">${i+1}</div><div>${s}</div></div>`).join('')}</div>
+        ${fl}
+        <div class="al al-y" style="margin-top:12px"><span>⏱️</span><div style="white-space:pre-line">${r.plazo}</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-p" onclick="wizNode='start';wizHist=[];render()">🔄 Nueva consulta</button>
+        <button class="btn btn-s" onclick="setRule('${nd.result}');go('rules')">📖 Ver regla completa</button>
+        ${bk}</div>
+    </div>`;}
+  return`<h2>🧭 Árbol de Decisión</h2><div class="sub">Responda las preguntas para identificar la regla correcta</div>
+  <div class="wz">
+    <div class="wz-prog">${dots}<span style="font-size:11px;color:var(--tl);margin-left:6px">Paso ${wizHist.length+1} de ${tot}</span></div>
+    ${nd.note?`<div class="wz-note">⚠️ ${nd.note}</div>`:''}
+    <div style="font-size:15px;font-weight:700;margin-bottom:12px">${nd.q}</div>
+    ${nd.opts.map(o=>`<button class="wo" onclick="wGo('${o.n}')"><span class="wl">${o.l}</span>${o.s?`<span class="ws">${o.s}</span>`:''}</button>`).join('')}
+    ${wizHist.length?`<div style="margin-top:10px">${bk}</div>`:''}
+  </div>`;}
+
+function wGo(n){wizHist.push(wizNode);wizNode=n;render();}
+function wBack(){if(wizHist.length){wizNode=wizHist.pop();render();}}
+
+// ── RULES ──
+function rRules(){
+  const r=RD[selRule];
+  const chips=Object.values(RD).map(x=>`<div class="rc ${selRule===x.code?'s':''}" onclick="setRule('${x.code}')">
+    <div class="rcd">${x.code}</div>
+    <div class="rnm">${x.name.length>44?x.name.slice(0,42)+'…':x.name}</div>
+    <div style="margin-top:4px"><span class="bx ${x.bc}">${x.badge}</span></div>
+  </div>`).join('');
+  const TABS=['¿Cuándo?','Procedimiento','Documentos','Plazos','Riesgos','Legal'];
+  const tc=[
+    `<ul class="ld">${r.when.map(w=>`<li>${w}</li>`).join('')}</ul>`,
+    `<ol class="ls">${r.steps.map(s=>`<li>${s}</li>`).join('')}</ol>`,
+    `<ul class="ld">${r.docs.map(d=>`<li>${d}</li>`).join('')}</ul>`,
+    `<div class="al al-y"><span>⏱️</span><div style="white-space:pre-line">${r.plazo}</div></div>${r.flow?`<h4 style="margin-top:12px">Flujo</h4><div class="fl">${r.flow.map((f,i)=>i%2===0?`<span class="fn">${f}</span>`:`<span class="fa-arr">→</span>`).join('')}</div>`:''}`,
+    r.risks.map(x=>`<div class="ri"><span style="flex-shrink:0">⛔</span><div>${x}</div></div>`).join(''),
+    `<ul class="ld">${r.legal.map(l=>`<li>${l}</li>`).join('')}</ul>`
+  ];
+  return`<h2>📚 Reglas de Notificación</h2>
+  <div class="sub">Seleccione una regla y navegue por sus secciones</div>
+  <div class="rg">${chips}</div>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+      <span style="font-size:22px;font-weight:800;color:var(--p)">${r.code}</span>
+      <span class="bx ${r.bc}">${r.badge}</span>
+    </div>
+    <h3 style="margin-bottom:10px">${r.name}</h3>
+    <div class="tab-nav">
+      <button class="btn btn-g" onclick="tabBack()" ${tabHist.length===0?'disabled':''}>← Pestaña anterior</button>
+    </div>
+    <div class="tb-r">${TABS.map((t,i)=>`<button class="tb ${selTab===i?'a':''}" onclick="goTab(${i})">${t}</button>`).join('')}</div>
+    <div>${tc[selTab]}</div>
+  </div>`;}
+
+// ── CALC ──
+function rCalc(){return`
+<h2>📅 Calculadora de Plazos</h2>
+<div class="sub">Calcula el vencimiento en días hábiles (excluye sábados y domingos). Verifique festivos manualmente.</div>
+<div class="card">
+  <div class="cf">
+    <div class="fg"><label>Fecha de surtida</label><input type="date" id="cD" value="${new Date().toISOString().split('T')[0]}"></div>
+    <div class="fg"><label>Tipo de plazo</label>
+      <select id="cT">
+        <option value="15">Descargos – 15 días hábiles (R1–R7)</option>
+        <option value="10">Alegatos – 10 días hábiles (R5, R9, R11)</option>
+        <option value="5">Comparecencia – 5 días (R2, R3)</option>
+        <option value="20">Período probatorio – 20 días (R10)</option>
+        <option value="30">Período probatorio – 30 días (R10)</option>
+        <option value="c">Personalizado…</option>
+      </select></div>
+    <div class="fg" id="cCW" style="display:none"><label>Días hábiles</label><input type="number" id="cC" min="1" max="120" value="15"></div>
+  </div>
+  <button class="btn btn-p" onclick="calcD()">Calcular vencimiento →</button>
+</div>
+<div id="cR"></div>
+<div class="card">
+  <h3>📌 Reglas de cómputo por tipo</h3>
+  <div style="margin-top:10px">
+    <div class="al al-b"><span>ℹ️</span><div><strong>R1:</strong> Surtida = momento del acuse de entrega. Plazo inicia día hábil siguiente.</div></div>
+    <div class="al al-y"><span>ℹ️</span><div><strong>R5:</strong> Surtida = AL FINALIZAR el día hábil siguiente a la entrega exitosa.</div></div>
+    <div class="al al-r"><span>ℹ️</span><div><strong>R7:</strong> Surtida = AL FINALIZAR el día hábil siguiente al RETIRO de la publicación.</div></div>
+    <div class="al al-g"><span>ℹ️</span><div><strong>R13:</strong> Surtida = fecha de RADICACIÓN ante MinTIC, no de redacción.</div></div>
+  </div>
+</div>`;}
+
+function bindCalc(){
+  const s=document.getElementById('cT'),w=document.getElementById('cCW');
+  if(s&&w)s.addEventListener('change',()=>{w.style.display=s.value==='c'?'block':'none';});
+}
+function calcD(){
+  const dv=document.getElementById('cD').value;
+  const tv=document.getElementById('cT').value;
+  if(!dv)return;
+  const dias=tv==='c'?parseInt(document.getElementById('cC').value)||15:parseInt(tv);
+  const st=new Date(dv+'T12:00:00');
+  const ini=bizAdd(st,1);
+  const vn=bizAdd(ini,dias-1);
+  document.getElementById('cR').innerHTML=`<div class="cr">
+    <div class="lbl">Fecha de surtida</div>
+    <div style="font-size:14px;font-weight:600;margin:4px 0">${fmtD(st)}</div>
+    <hr style="border:none;border-top:1px solid var(--bd);margin:10px 0">
+    <div class="lbl">Plazo inicia (día hábil siguiente)</div>
+    <div style="font-size:13px;color:var(--tl);margin:4px 0">${fmtD(ini)}</div>
+    <hr style="border:none;border-top:1px solid var(--bd);margin:10px 0">
+    <div class="lbl">Vencimiento (${dias} días hábiles)</div>
+    <div class="big">${fmtD(vn)}</div>
+    <div class="dtl">⚠️ Excluye sábados y domingos. Verifique festivos colombianos manualmente.</div>
+  </div>`;}
+
+// ── CHECKLISTS ──
+function rCheck(){
+  const ks=Object.keys(CL);const c=CL[selChk];
+  if(!chkSt[selChk])chkSt[selChk]=c.items.map(()=>false);
+  const dn=chkSt[selChk].filter(Boolean).length;
+  const pct=Math.round(dn/c.items.length*100);
+  return`<h2>✅ Checklists de Control de Calidad</h2>
+  <div class="sub">Verifique la documentación antes de pasar a la siguiente etapa</div>
+  <div class="pf-row">${ks.map(k=>`<button class="pill ${selChk===k?'a':''}" onclick="selChk='${k}';render()">${k}</button>`).join('')}</div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <h3>${c.label}</h3>
+      <span style="font-size:12px;font-weight:700;color:${pct===100?'var(--g)':'var(--tl)'}">${dn}/${c.items.length} · ${pct}%</span>
+    </div>
+    <div class="pb"><div class="pf-bar" style="width:${pct}%"></div></div>
+    ${pct===100?`<div class="al al-g"><span>🎉</span><div><strong>¡Completa!</strong> Puede proceder a la siguiente etapa.</div></div>`:''}
+    <div>${c.items.map((it,i)=>`<div class="chi ${chkSt[selChk][i]?'dn':''}" onclick="tChk(${i})">
+      <input type="checkbox" ${chkSt[selChk][i]?'checked':''} onclick="event.stopPropagation();tChk(${i})">
+      <span class="cl">${it.t}${it.crit?'<span class="crit">CRÍTICO</span>':''}</span>
+    </div>`).join('')}</div>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="btn btn-g" onclick="chkSt[selChk]=CL[selChk].items.map(()=>false);render()">🔄 Reiniciar</button>
+      <button class="btn btn-g" onclick="chkSt[selChk]=CL[selChk].items.map(()=>true);render()">☑️ Marcar todo</button>
+    </div>
+  </div>`;}
+
+function tChk(i){if(!chkSt[selChk])chkSt[selChk]=CL[selChk].items.map(()=>false);chkSt[selChk][i]=!chkSt[selChk][i];render();}
+
+// ── CAUSALS ──
+function rCausals(){return`
+<h2>↩️ Causales de Devolución (R6)</h2>
+<div class="sub">Identifique la causal y aplique la acción correspondiente</div>
+<div class="al al-r"><span>⚠️</span><div><strong>Regla crítica:</strong> Si caducidad &lt;30 días → acelerar a R7. NUNCA archivar sin intentar notificar.</div></div>
+<div class="card" style="padding:0;overflow:hidden">
+  <table>
+    <thead><tr><th>Código</th><th>Nombre</th><th>Significado</th><th>¿Subsanable?</th><th>Acción</th><th>Tiempo</th></tr></thead>
+    <tbody>${CAUSALS.map(x=>`<tr class="${x.s===true?'sub':x.s===false?'nosub':''}">
+      <td><strong>${x.c}</strong></td><td>${x.n}</td><td style="color:var(--tl)">${x.d}</td>
+      <td style="text-align:center">${x.s===true?'<span class="bx bg">✅ SÍ</span>':x.s===false?'<span class="bx br">❌ NO</span>':'<span class="bx btl">Evaluar</span>'}</td>
+      <td>${x.a}</td><td style="color:var(--tl);white-space:nowrap">${x.t}</td>
+    </tr>`).join('')}</tbody>
+  </table>
+</div>
+<div class="g2" style="margin-top:4px">
+  <div class="card" style="border-left:4px solid var(--g)">
+    <h3 style="color:var(--g)">✅ Subsanables → Relanzar</h3>
+    <div style="font-size:12px;color:var(--tl);line-height:2;margin-top:8px">
+      <strong>NE</strong> – Número errado: corregir en RUES<br>
+      <strong>DR</strong> – Dirección errada: validar y reenviar<br>
+      <strong>N1/N2</strong> – No contactado: esperar 3–5 días<br>
+      <strong>C1/C2</strong> – Cerrado: esperar normalización<br>
+      <strong>FM</strong> – Fuerza mayor: esperar y relanzar
+    </div>
+  </div>
+  <div class="card" style="border-left:4px solid var(--r)">
+    <h3 style="color:var(--r)">❌ No Subsanables → Cambiar regla</h3>
+    <div style="font-size:12px;color:var(--tl);line-height:2;margin-top:8px">
+      <strong>NS</strong> – No reside → cambiar a R5<br>
+      <strong>RH</strong> – Rehusado → cambiar a R5<br><br>
+      <span style="color:var(--r)">⚠️ Si caducidad &lt;30 días → R7 directo</span>
+    </div>
+  </div>
+</div>`;}
+
+// ── FAQ ──
+function rFaq(){return`
+<h2>❓ Preguntas Frecuentes</h2>
+<div class="sub">Respuestas a las dudas operativas más comunes</div>
+<input class="srch" placeholder="🔍 Buscar…" oninput="fFaq(this.value)">
+<div id="fL">${FAQ.map((f,i)=>`<div class="fi" data-q="${(f.q+f.a).toLowerCase()}">
+  <div class="fq" onclick="tFaq(${i})"><span>${f.q}</span><span id="fa${i}">${faqOpen===i?'▲':'▼'}</span></div>
+  <div class="fat ${faqOpen===i?'op':''}" id="fat${i}">${f.a}</div>
+</div>`).join('')}</div>`;}
+
+function tFaq(i){
+  faqOpen=faqOpen===i?-1:i;
+  document.querySelectorAll('.fat').forEach((f,j)=>f.classList.toggle('op',faqOpen===j));
+  document.querySelectorAll('[id^="fa"]').forEach((a,j)=>a.textContent=faqOpen===j?'▲':'▼');
+}
+function fFaq(v){document.querySelectorAll('#fL .fi').forEach(f=>{f.style.display=f.dataset.q.includes(v.toLowerCase())?'':'none';});}
+
+// ── GLOSSARY ──
+function rGlossary(){return`
+<h2>📖 Glosario de Expresiones Canónicas</h2>
+<div class="sub">Términos técnico-jurídicos del Manual SIA v2.0</div>
+<input class="srch" placeholder="🔍 Buscar término…" oninput="fGlos(this.value)">
+<div class="card" style="padding:0;overflow:hidden">
+  <table><thead><tr><th>Término</th><th>Definición</th><th>Regla</th></tr></thead>
+  <tbody id="gB">${GLOS.map(x=>`<tr data-s="${(x.t+x.d).toLowerCase()}">
+    <td><strong>${x.t}</strong></td><td style="color:var(--tl)">${x.d}</td>
+    <td><span class="bx bp">${x.r}</span></td>
+  </tr>`).join('')}</tbody></table>
+</div>`;}
+
+function fGlos(v){document.querySelectorAll('#gB tr').forEach(r=>{r.style.display=r.dataset.s.includes(v.toLowerCase())?'':'none';});}
+
+// ===== INIT =====
+mkSidebar();render();
+</script>
+</body>
+</html>
